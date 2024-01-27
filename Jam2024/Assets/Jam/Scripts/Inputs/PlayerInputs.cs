@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerInputs : MonoBehaviour
 {
     public Action<Vector2> OnMovementAxis;
+    public Action<bool> OnSprint;
     
     private Vector3 _lastMovement;
 
@@ -18,7 +19,18 @@ public class PlayerInputs : MonoBehaviour
 
     private void Update()
     {
+        // Movement
         UpdateMovement(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
+
+        // Sprint
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            OnSprint?.Invoke(true);
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            OnSprint?.Invoke(false);
+        }
     }
 
     private void UpdateMovement(Vector2 movement)

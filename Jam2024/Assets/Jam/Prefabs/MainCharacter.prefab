@@ -218,6 +218,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 5
   _rigidbody2D: {fileID: 4712240862012154802}
+  _sprintSpeed: 10
+  _staminaConsumption: 0.5
+  _staminaRecharge: 0.3
 --- !u!114 &4915883772018929332
 MonoBehaviour:
   m_ObjectHideFlags: 0
