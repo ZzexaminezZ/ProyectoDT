@@ -11,12 +11,20 @@ public class CharacterMovement : MonoBehaviour
     private Vector2 _currentDirection;
     public Action<Vector2> OnChangeDirection;
 
-    [Header("Sprint")]
-    [SerializeField] private float _sprintSpeed = 10f;
+    [Header("Dash")]
+    [SerializeField] private float _dashCD = 0.7f;
+    [SerializeField] private float _dashDistance = 2f;
+    [SerializeField] private float _dashTime = 0.5f;
+    [SerializeField] private AnimationCurve _dashCurve;
+    private float lastDashTime;
+
+    [Header("Stamina")]
     [SerializeField] private float _staminaConsumption = 0.1f;
     [SerializeField] private float _staminaRecharge = 0.1f;
+
     private float _currentStamina = 1;
-    private bool _sprinting;
+
+    private bool _dashing;
     private bool _recharginStamina;
 
     private float _currentAnimationSpeed;
@@ -27,21 +35,13 @@ public class CharacterMovement : MonoBehaviour
     private void Start()
     {
         PlayerInputs.Instance.OnMovementAxis += Move;
-        PlayerInputs.Instance.OnSprint += Sprint;
+        PlayerInputs.Instance.OnDash += Dash;
     }
 
     private void Update()
     {
-        if (_sprinting)
-        {
-            UpdateStamina(-_staminaConsumption * Time.deltaTime);
-            if (_currentStamina <= 0)
-            {
-                _recharginStamina = true;
-                _sprinting = false;
-            }
-        }
-        else if (_currentStamina < 1)
+        //dash
+        if (_currentStamina < 1)
         {
             UpdateStamina(_staminaRecharge * Time.deltaTime);
 
@@ -55,21 +55,66 @@ public class CharacterMovement : MonoBehaviour
     private void UpdateStamina(float value)
     {
         _currentStamina += value;
+
+        if (_currentStamina <= 0)
+        {
+            _recharginStamina = true;
+        }
+
         _currentStamina = Mathf.Clamp01(_currentStamina);
 
         OnStaminaChange?.Invoke(_currentStamina, _recharginStamina);
     }
-
-    private void Sprint(bool sprinting)
+    private void Dash()
     {
-        _sprinting = sprinting && !_recharginStamina;
+        if (_dashing || 
+            _recharginStamina || 
+            DashCD())
+            return;
+
+
+        UpdateStamina(-_staminaConsumption);
+
+        StartCoroutine(DashCoroutine());
     }
+
+    private bool DashCD()
+    {
+        return Time.time - lastDashTime < _dashCD;
+    }
+
+    private IEnumerator DashCoroutine()
+    {
+        lastDashTime = Time.time;
+        _dashing = true;
+
+        Vector3 initPos = transform.position;
+        Vector3 endPos = transform.position + (Vector3)_currentDirection * _dashDistance;
+
+        float timer = 0;
+
+        while (timer < _dashTime)
+        {
+            float t = timer / _dashTime;
+
+            Vector3 target = Vector3.Lerp(initPos, endPos, _dashCurve.Evaluate(t));
+
+            _rigidbody2D.MovePosition(target);
+
+            timer += Time.deltaTime;
+
+            yield return null;
+        }
+
+        _dashing = false;
+    }
+
 
     private void Move(Vector2 moveVector)
     {
-        float speed = _sprinting ? _sprintSpeed : _speed;
+        if (_dashing) return;
 
-        _rigidbody2D.velocity = moveVector * speed * Time.deltaTime * 100f;
+        _rigidbody2D.velocity = moveVector * _speed;
 
         if (moveVector != Vector2.zero  && moveVector != _currentDirection)
         {
@@ -77,12 +122,10 @@ public class CharacterMovement : MonoBehaviour
             _currentDirection = moveVector;
         }
 
-        float animationSpeed = moveVector.magnitude * (_sprinting ? 2 : 1);
-
-        if (animationSpeed != _currentAnimationSpeed)
+        if (moveVector.magnitude != _currentAnimationSpeed)
         {
-            OnChangeVelocity?.Invoke(animationSpeed);
-            _currentAnimationSpeed = animationSpeed;
+            OnChangeVelocity?.Invoke(moveVector.magnitude);
+            _currentAnimationSpeed = moveVector.magnitude;
         }
 
     }

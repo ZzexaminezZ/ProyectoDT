@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerInputs : MonoBehaviour
 {
     public Action<Vector2> OnMovementAxis;
-    public Action<bool> OnSprint;
+    public Action OnDash;
     
     private Vector3 _lastMovement;
 
@@ -22,14 +22,10 @@ public class PlayerInputs : MonoBehaviour
         // Movement
         UpdateMovement(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
 
-        // Sprint
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        //Dash
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            OnSprint?.Invoke(true);
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            OnSprint?.Invoke(false);
+            OnDash?.Invoke();
         }
     }
 
