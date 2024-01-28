@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,11 +6,6 @@ public class PickerProgressBar : MonoBehaviour
     [SerializeField] private Color _defaultColor;
 
     [SerializeField] private Image _progressBar;
-
-    private void Start()
-    {
-        gameObject.SetActive(false);
-    }
 
     public void UpdateProgressBar(float progress)
     {
