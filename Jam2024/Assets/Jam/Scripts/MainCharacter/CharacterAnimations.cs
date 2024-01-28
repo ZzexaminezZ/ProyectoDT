@@ -24,8 +24,6 @@ public class CharacterAnimations : MonoBehaviour
 
     private void ChangeDirection(Vector2 vector)
     {
-       _animator.transform.localScale = new Vector3(vector.x >= 0 ? 1 : -1, 1, 1);
-
         _animator.SetFloat("DirX", vector.x);
         _animator.SetFloat("DirY", vector.y);
     }
