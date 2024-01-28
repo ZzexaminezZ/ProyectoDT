@@ -28,8 +28,10 @@ public class CharacterMovement : MonoBehaviour
     private bool _recharginStamina;
 
     private float _currentAnimationSpeed;
+
     public Action<float> OnChangeVelocity;
     public Action<float, bool> OnStaminaChange;
+    public Action<bool> OnDash;
 
 
     private void Start()
@@ -87,6 +89,7 @@ public class CharacterMovement : MonoBehaviour
     {
         lastDashTime = Time.time;
         _dashing = true;
+        OnDash?.Invoke(true);
 
         Vector3 initPos = transform.position;
         Vector3 endPos = transform.position + (Vector3)_currentDirection * _dashDistance;
@@ -106,6 +109,7 @@ public class CharacterMovement : MonoBehaviour
             yield return null;
         }
 
+        OnDash?.Invoke(false);
         _dashing = false;
     }
 
