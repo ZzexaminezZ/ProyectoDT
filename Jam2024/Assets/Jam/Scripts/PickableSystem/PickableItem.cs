@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -11,13 +12,15 @@ public class PickableItem : MonoBehaviour
     private bool _siBeingPick = false;
     private float _pickingProgress = 0;
 
-    [SerializeField] private float _pickingSpeed = 0.1f;
+    [SerializeField] private float pickingSpeed = 0.1f;
+
+    public float PickingSpeed => pickingSpeed;
 
     void Update()
     {
         if (_siBeingPick && _pickingProgress < 1)
         {
-            _pickingProgress += _pickingSpeed * Time.deltaTime;
+            _pickingProgress += pickingSpeed * Time.deltaTime;
             _pickingProgress = Mathf.Clamp01(_pickingProgress);
             
             OnPicking(_pickingProgress);

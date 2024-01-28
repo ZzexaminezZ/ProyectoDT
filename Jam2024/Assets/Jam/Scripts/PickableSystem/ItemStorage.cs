@@ -14,14 +14,12 @@ public class ItemStorage : MonoBehaviour
     private bool _isStoring = false;
     private float _storingProgress = 0;
     private PickableItem _itemToStore;
-    
-    [SerializeField] private float storingSpeed = 0.1f;
 
     private void Update()
     {
-        if (_isStoring && _storingProgress < 1)
+        if (_isStoring && _storingProgress < 1 && _itemToStore != null)
         {
-            _storingProgress += storingSpeed * Time.deltaTime;
+            _storingProgress += _itemToStore.PickingSpeed * Time.deltaTime;
             _storingProgress = Mathf.Clamp01(_storingProgress);
             
             OnStoring(_storingProgress);
