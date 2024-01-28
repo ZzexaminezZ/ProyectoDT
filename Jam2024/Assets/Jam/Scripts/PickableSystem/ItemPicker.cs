@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ItemPicker : MonoBehaviour
@@ -6,8 +7,14 @@ public class ItemPicker : MonoBehaviour
 
     public PickableItem PickedItem => _pickedItem;
 
+
     private PickableItem _itemToPick;
     [SerializeField] private PickerProgressBar uiProgressBar;
+
+    public Action<bool> OnPickItem;
+
+    [Header("Item viewer")]
+    [SerializeField] private SpriteRenderer _itemViewer;
     
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -16,7 +23,12 @@ public class ItemPicker : MonoBehaviour
             if (other.TryGetComponent(out ItemStorage storage))
             {
                 storage.StartStoring(_pickedItem);
-                storage.OnStoredItem += () => _pickedItem = null;
+                storage.OnStoredItem += () =>
+                {
+                    OnPickItem?.Invoke(false);
+                    _itemViewer.gameObject.SetActive(false);
+                    _pickedItem = null;
+                };
                 
                 if (uiProgressBar != null)
                 {
@@ -38,6 +50,9 @@ public class ItemPicker : MonoBehaviour
             _itemToPick.StartPicking();
             _itemToPick.OnPickItem += item =>
             {
+                OnPickItem?.Invoke(true);
+                _itemViewer.gameObject.SetActive(true);
+                _itemViewer.sprite = item.Sprite;
                 _pickedItem = item;
                 _itemToPick = null;
             };

@@ -16,6 +16,8 @@ public class PickableItem : MonoBehaviour
 
     public float PickingSpeed => pickingSpeed;
 
+    public Sprite Sprite => GetComponent<SpriteRenderer>().sprite;
+
     void Update()
     {
         if (_siBeingPick && _pickingProgress < 1)
