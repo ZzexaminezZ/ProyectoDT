@@ -7,6 +7,7 @@ public class ItemPicker : MonoBehaviour
     public PickableItem PickedItem => _pickedItem;
 
     private PickableItem _itemToPick;
+    [SerializeField] private PickerProgressBar uiProgressBar;
     
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -16,12 +17,24 @@ public class ItemPicker : MonoBehaviour
             {
                 storage.StartStoring(_pickedItem);
                 storage.OnStoredItem += () => _pickedItem = null;
+                
+                if (uiProgressBar != null)
+                {
+                    storage.OnStoringProgress += uiProgressBar.UpdateProgressBar;
+                    uiProgressBar.gameObject.SetActive(true);
+                }
             }
             return;
         }
+        
         if (other.TryGetComponent(out PickableItem pickable))
         {
             _itemToPick = pickable;
+            if (uiProgressBar != null)
+            {
+                _itemToPick.OnPickingProgress += uiProgressBar.UpdateProgressBar;
+                uiProgressBar.gameObject.SetActive(true);
+            }
             _itemToPick.StartPicking();
             _itemToPick.OnPickItem += item =>
             {
@@ -39,6 +52,11 @@ public class ItemPicker : MonoBehaviour
             {
                 storage.EndStoring();
                 storage.RemoveTempItem();
+                
+                if (uiProgressBar != null)
+                {
+                    uiProgressBar.RestartProgressBar();
+                }
             }
             return;
         }
@@ -50,6 +68,11 @@ public class ItemPicker : MonoBehaviour
                 _itemToPick.EndPicking();
                 _itemToPick.OnPickItem = null;
                 _itemToPick = null;
+
+                if (uiProgressBar != null)
+                {
+                    uiProgressBar.RestartProgressBar();
+                }
             }
         }
     }
