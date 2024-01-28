@@ -116,7 +116,11 @@ public class CharacterMovement : MonoBehaviour
 
     private void Move(Vector2 moveVector)
     {
-        if (_dashing) return;
+        if (_dashing)
+        {
+            _rigidbody2D.velocity = Vector2.zero;
+            return;
+        }
 
         _rigidbody2D.velocity = moveVector * _speed;
 

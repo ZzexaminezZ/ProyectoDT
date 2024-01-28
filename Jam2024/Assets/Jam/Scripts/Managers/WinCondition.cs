@@ -36,6 +36,8 @@ public class WinCondition : MonoBehaviour
 
     private void ItemStored(PickableItem item)
     {
+        if (item == null) return;
+
         _uiItems[item].SetItemStored();
         _itemsStored++;
 
