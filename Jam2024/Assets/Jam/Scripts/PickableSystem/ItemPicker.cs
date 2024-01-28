@@ -12,6 +12,7 @@ public class ItemPicker : MonoBehaviour
     [SerializeField] private PickerProgressBar uiProgressBar;
 
     public Action<bool> OnPickItem;
+    public Action<PickableItem> OnItemStored;
 
     [Header("Item viewer")]
     [SerializeField] private SpriteRenderer _itemViewer;
@@ -26,6 +27,7 @@ public class ItemPicker : MonoBehaviour
                 storage.OnStoredItem += () =>
                 {
                     OnPickItem?.Invoke(false);
+                    OnItemStored?.Invoke(_pickedItem);
                     _itemViewer.gameObject.SetActive(false);
                     _pickedItem = null;
                 };
